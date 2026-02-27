@@ -1,0 +1,11 @@
+# Backend ignores
+backend/.env
+backend/myenv/
+backend/__pycache__/
+backend/*.pyc
+
+# Frontend ignores
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/build/
