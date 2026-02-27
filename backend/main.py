@@ -48,21 +48,24 @@ def respond(request: UserRequest):
         "message": "Your conversational response or answer to the user's question goes here."
     }}
     """
-    response = '''client.models.generate_content(
+    
+    response = client.models.generate_content(
         model="gemini-3-flash-preview", 
         contents=request.prompt,
         config=types.GenerateContentConfig(
             system_instruction=system_rules,
             response_mime_type="application/json",
         ),
-    )'''
-    #aiResponse = json.loads(response.text)
+    )
+    aiResponse = json.loads(response.text)
+    '''
     aiResponse ={
-        "tasks": [{"action": "closeApp", "arguments": {"appName": "whatsapp"}},
-    {"action": "openApp", "arguments": {"appName": "spotify"}}
+        "tasks": [{"action": "openApp", "arguments": {"appName": "whatsapp"}},
+    {"action": "openApp", "arguments": {"appName": "calculator"}}
     ],
-        "message": "Opening WhatsApp!"
+        "message": "Opening WhatsApp and calculator!"
     }
+    '''
    
     tasks = aiResponse.get("tasks", [])
     msg = runActions(tasks)
