@@ -15,7 +15,7 @@ class KemoView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         child: Padding(
           padding: const EdgeInsets.only(
             top: 20.0,

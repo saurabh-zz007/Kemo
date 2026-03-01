@@ -1,12 +1,12 @@
 import json
 import os
-from google import genai  # NEW: The modern Google SDK
+from google import genai  
 from dotenv import load_dotenv
 
-# Import your isolated tools
 from tools.app_manager import open_app, close_app
 from tools.system_monitor import get_system_status
 from tools.system_optimizer import optimize_system
+from tools.env_setup import setup_environment, remove_environment
 
 load_dotenv() 
 
@@ -15,20 +15,16 @@ TOOL_REGISTRY = {
     "openApp": open_app,
     "closeApp": close_app,
     "getSystemStatus": get_system_status,
-    "optimizeSystem": optimize_system
+    "optimizeSystem": optimize_system,
+    "setupEnvironment": setup_environment,
+    "removeEnvironment": remove_environment
 }
 
-# NEW: Initialize the modern SDK Client
-# It will automatically look for 'GEMINI_API_KEY' in your environment/.env file!
 client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
-MODEL_ID = 'gemini-2.5-flash'
+MODEL_ID = 'gemini-2.5-flash-lite'
 
 def execute_kemo_command(user_prompt: str) -> dict:
-    """The master ReAct loop for KEMO."""
-    
-    # ---------------------------------------------------------
-    # PASS 1: THE PLANNER
-    # ---------------------------------------------------------
+  
     planner_prompt = f"""
     You are the system brain of KEMO, an AI desktop assistant.
     The user asked: "{user_prompt}"
@@ -39,20 +35,33 @@ def execute_kemo_command(user_prompt: str) -> dict:
     - "closeApp" (requires argument: 'app_name')
     - "getSystemStatus" (no arguments)
     - "optimizeSystem" (no arguments)
-    
+    - "setupEnvironment" (requires argument: 'package_id').
+    - "removeEnvironment" (requires argument: 'package_id').
+      CRITICAL: For setupEnvironment AND removeEnvironment, use your knowledge to determine the OFFICIAL Windows Winget ID (e.g., 'Microsoft.OpenJDK.17' for Java, 'OpenJS.NodeJS' for Node) and pass it as the 'package_id'.
+      CRITICAL INSTRUCTION FOR PACKAGE IDs:
+    Do NOT invent, guess, or spell out Winget IDs. You MUST use these exact strings:
+    - For Go: use EXACTLY "GoLang.Go" (DO NOT use "The.Go.Programming.Language")
+    - For Zig: use EXACTLY "zig.zig"
+    - For Python: use EXACTLY "Python.Python.3.11"
+    - For Java: use EXACTLY "Microsoft.OpenJDK.17"
+    - For C++: use EXACTLY "Microsoft.VisualStudio.2022.BuildTools"
+    - For Node.js: use EXACTLY "OpenJS.NodeJS"
+
     Respond ONLY with a valid JSON array of tasks. Do not include markdown formatting.
-    Example: [{{"action": "openApp", "arguments": {{"app_name": "notepad"}}}}]
-    If no actions are needed (just a conversation), output an empty array: []
+    Example: [{{"action": "setupEnvironment", "arguments": {{"package_id": "Microsoft.OpenJDK.17"}}}}]
+    If no actions are needed, output an empty array: []
     """
     
     try:
-        # NEW: The updated generation syntax
         planner_response = client.models.generate_content(
             model=MODEL_ID, 
             contents=planner_prompt
         )
         raw_text = planner_response.text.strip().removeprefix('```json').removesuffix('```').strip()
         ai_planned_tasks = json.loads(raw_text)
+
+        print(f"\n[KEMO X-RAY] Executing Tasks: {ai_planned_tasks}\n")
+        
     except Exception as e:
         print(f"Planner Error: {e}")
         ai_planned_tasks = []

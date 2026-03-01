@@ -9,7 +9,6 @@ class UserRequest(BaseModel):
 
 @app.post("/execute")
 async def execute_endpoint(request: UserRequest):
-    # Pass the prompt directly to our isolated ReAct Agent
     response_payload = execute_kemo_command(request.prompt)
     
     return response_payload
