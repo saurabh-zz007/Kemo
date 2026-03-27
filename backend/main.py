@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from controllers.executer import execute_kemo_command
+from controllers.executer_groq import execute_kemo_command
 
 app = FastAPI()
 

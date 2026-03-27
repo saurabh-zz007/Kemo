@@ -13,7 +13,7 @@ def open_app(app_name: str) -> str:
 def close_app(app_name: str) -> str:
     """Attempts to close a Windows application and returns the result."""
     try:
-        app_close(app_name, match_closest=True, throw_error=True)
+        app_close(app_name, match_closest=False, throw_error=True)
         return f"SUCCESS: '{app_name}' was successfully closed."
     except Exception as e:
         return f"FAILURE: Could not close '{app_name}'. It might not be running. Details: {str(e)}"
